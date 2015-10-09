@@ -1,19 +1,27 @@
-$.get("https://api.github.com/repos/amykangweb/portfolio/issues?state=open&access_token=", function( data ) {
-  e = jQuery.Event( 'keyup', { which: 13 } );
-  notices = [];
-  numbers = [];
-  $(data).each(function(issue) {
-    notices.push(data[issue].title.toString());
-    numbers.push(data[issue].number.toString());
-  });
+$.get( "https://api.github.com/repos/amykangweb/portfolio/issues?state=all&access_token=25baa5b4e53dfda3a07dd237f25c49249a17cc1f", function( data ) {
 
-  var setTask = function(element){
-    setTimeout(function(){
-      $('#new-todo').val(element);
-      $('#new-todo').trigger(e);
-    }, 20);
-  }
-  notices.forEach(setTask);
+	console.log(data.map(function(el){
+		return el.state;
+	}));
+
+  e = jQuery.Event( 'keyup', { which: 13 } );
+  numbers = [];
+  states = [];
+	notices = [];
+	$(data).each(function(issue) {
+		notices.push(data[issue].title.toString());
+		states.push(data[issue].state.toString());
+		numbers.push(data[issue].number);
+	});
+
+	var setTask = function(element){
+		setTimeout(function(){
+		$('#new-todo').val(element);
+		$('#new-todo').trigger(e);
+		}, 20);
+	}
+	notices.forEach(setTask);
+
 /*global jQuery, Handlebars, Router */
 jQuery(function ($) {
 	'use strict';
@@ -24,6 +32,21 @@ jQuery(function ($) {
 
 	var ENTER_KEY = 13;
 	var ESCAPE_KEY = 27;
+
+	var issue = {
+		status: function() {
+			var status;
+			var revise = [];
+			for(var i = 0; i < states.length; i++) {
+				if(states[i] == "open") {
+					revise.push(true);
+				}else{
+					revise.push(false);
+				}
+			}
+			return status = revise.shift();
+		}
+	};
 
 	var util = {
 		uuid: function () {
@@ -156,7 +179,7 @@ jQuery(function ($) {
 			this.todos.push({
 				id: util.uuid(),
 				title: val,
-				completed: false
+				completed: issue.status()
 			});
 
 			$input.val('');
@@ -174,7 +197,7 @@ jQuery(function ($) {
 			}
 
 			$.ajax({
-    		url: 'https://api.github.com/repos/amykangweb/portfolio/issues/23?access_token=333f4d2ef1cb9f3bdd6ba694a05306594c147125',
+    		url: "https://api.github.com/repos/amykangweb/portfolio/issues/"+ this.todos[i].id + "?access_token=25baa5b4e53dfda3a07dd237f25c49249a17cc1f",
     		type: 'PATCH',
 				data: '{"state": "'+ now +'"}',
 				contentType: "application/json; charset=utf-8",
