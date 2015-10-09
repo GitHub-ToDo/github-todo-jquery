@@ -163,8 +163,24 @@ jQuery(function ($) {
 			this.render();
 		},
 		toggle: function (e) {
+			var now;
 			var i = this.indexFromEl(e.target);
 			this.todos[i].completed = !this.todos[i].completed;
+			if(this.todos[i].completed = true) {
+				now = "closed";
+			}else {
+				now = "open";
+			}
+
+			$.ajax({
+    		url: 'https://api.github.com/repos/amykangweb/portfolio/issues/23?access_token=',
+    		type: 'PATCH',
+				data: '{"state": "'+ now +'"}',
+				contentType: "application/json; charset=utf-8",
+    		success: function(result) {
+        	alert(JSON.stringify(result));
+    	}
+		});
 			this.render();
 		},
 		edit: function (e) {
