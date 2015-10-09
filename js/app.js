@@ -1,8 +1,4 @@
-$.get( "https://api.github.com/repos/amykangweb/portfolio/issues?state=all&access_token=25baa5b4e53dfda3a07dd237f25c49249a17cc1f", function( data ) {
-
-	console.log(data.map(function(el){
-		return el.state;
-	}));
+$.get( "https://api.github.com/repos/amykangweb/portfolio/issues?state=all&access_token=33d122037f7bd215d051e3f94dfb13f0a8602f81", function( data ) {
 
   e = jQuery.Event( 'keyup', { which: 13 } );
   numbers = [];
@@ -21,6 +17,18 @@ $.get( "https://api.github.com/repos/amykangweb/portfolio/issues?state=all&acces
 		}, 20);
 	}
 	notices.forEach(setTask);
+
+	setTimeout(function(){
+		var index = 0;
+		$('#todo-list li').each(function(){
+			console.log(states[index]);
+			$(this).attr('data-github', numbers[index]);
+			if(states[index] == 'closed'){
+				$(this).addClass('completed');
+			}
+		index++;
+	});
+	}, 20);
 
 /*global jQuery, Handlebars, Router */
 jQuery(function ($) {
@@ -196,8 +204,10 @@ jQuery(function ($) {
 				now = "open";
 			}
 
+			console.log(now);
+
 			$.ajax({
-    		url: "https://api.github.com/repos/amykangweb/portfolio/issues/"+ this.todos[i].id + "?access_token=25baa5b4e53dfda3a07dd237f25c49249a17cc1f",
+    		url: "https://api.github.com/repos/amykangweb/portfolio/issues/"+ this.todos[i].id + "?access_token=33d122037f7bd215d051e3f94dfb13f0a8602f81",
     		type: 'PATCH',
 				data: '{"state": "'+ now +'"}',
 				contentType: "application/json; charset=utf-8",
