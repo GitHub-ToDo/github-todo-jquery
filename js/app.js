@@ -1,4 +1,4 @@
-$.get( "https://api.github.com/repos/amykangweb/portfolio/issues?state=open&access_token=333f4d2ef1cb9f3bdd6ba694a05306594c147125", function( data ) {
+$.get("https://api.github.com/repos/amykangweb/portfolio/issues?state=open&access_token=", function( data ) {
   e = jQuery.Event( 'keyup', { which: 13 } );
   notices = [];
   numbers = [];
@@ -14,12 +14,9 @@ $.get( "https://api.github.com/repos/amykangweb/portfolio/issues?state=open&acce
     }, 20);
   }
   notices.forEach(setTask);
-
 /*global jQuery, Handlebars, Router */
 jQuery(function ($) {
 	'use strict';
-
-	console.log(numbers);
 
 	Handlebars.registerHelper('eq', function (a, b, options) {
 		return a === b ? options.fn(this) : options.inverse(this);
@@ -175,8 +172,6 @@ jQuery(function ($) {
 			}else {
 				now = "open";
 			}
-
-			console.log(this.todos[i]);
 
 			$.ajax({
     		url: 'https://api.github.com/repos/amykangweb/portfolio/issues/23?access_token=333f4d2ef1cb9f3bdd6ba694a05306594c147125',
