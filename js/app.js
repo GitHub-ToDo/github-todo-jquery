@@ -1,6 +1,6 @@
-$.get( "https://api.github.com/repos/amykangweb/portfolio/issues?state=all&access_token=33d122037f7bd215d051e3f94dfb13f0a8602f81", function( data ) {
+$.get( "https://api.github.com/repos/amykangweb/portfolio/issues?state=all&access_token=b1398d9c6929724bf26c36d845c4afa4fa797e32", function( data ) {
 
-  e = jQuery.Event( 'keyup', { which: 13 } );
+  var v = jQuery.Event( 'keyup', { which: 13 } );
   numbers = [];
   states = [];
 	notices = [];
@@ -13,18 +13,20 @@ $.get( "https://api.github.com/repos/amykangweb/portfolio/issues?state=all&acces
 	var setTask = function(element){
 		setTimeout(function(){
 		$('#new-todo').val(element);
-		$('#new-todo').trigger(e);
+		$('#new-todo').trigger(v);
 		}, 20);
 	}
 	notices.forEach(setTask);
 
 	setTimeout(function(){
 		var index = 0;
+		console.log($('#todo-list li'));
 		$('#todo-list li').each(function(){
-			console.log(states[index]);
-			$(this).attr('data-github', numbers[index]);
-			if(states[index] == 'closed'){
+			if(states[index] === "closed"){
+				console.log("Closed!" + index.toString());
 				$(this).addClass('completed');
+			}else{
+				$(this).removeClass('completed');
 			}
 		index++;
 	});
@@ -47,9 +49,10 @@ jQuery(function ($) {
 			var revise = [];
 			for(var i = 0; i < states.length; i++) {
 				if(states[i] == "open") {
-					revise.push(true);
-				}else{
+					/* completed should be set to false if issue is open*/
 					revise.push(false);
+				}else{
+					revise.push(true);
 				}
 			}
 			return status = revise.shift();
@@ -112,6 +115,7 @@ jQuery(function ($) {
 			var todos = this.getFilteredTodos();
 			this.$todoList.html(this.todoTemplate(todos));
 			this.$main.toggle(todos.length > 0);
+			/*what's this?? TOGGLING CHECKED ATTR*/
 			this.$toggleAll.prop('checked', this.getActiveTodos().length === 0);
 			this.renderFooter();
 			this.$newTodo.focus();
@@ -132,10 +136,14 @@ jQuery(function ($) {
 			var isChecked = $(e.target).prop('checked');
 
 			this.todos.forEach(function (todo) {
-				todo.completed = isChecked;
+				if(isChecked === true) {
+					isChecked = false;
+				}else{
+					isChecked = true;
+				}
 			});
 
-			this.render();
+			return this.todo.completed = isChecked;
 		},
 		getActiveTodos: function () {
 			return this.todos.filter(function (todo) {
@@ -197,17 +205,20 @@ jQuery(function ($) {
 		toggle: function (e) {
 			var now;
 			var i = this.indexFromEl(e.target);
+			console.log(this.todos[i].completed);
 			this.todos[i].completed = !this.todos[i].completed;
-			if(this.todos[i].completed) {
+			if(this.todos[i].completed === true) {
+				$(this.todos[i]).addClass("completed");
 				now = "closed";
-			}else {
+			}else if(this.todos[i].completed === false){
+				$(this.todos[i]).removeClass("completed");
 				now = "open";
 			}
 
 			console.log(now);
 
 			$.ajax({
-    		url: "https://api.github.com/repos/amykangweb/portfolio/issues/"+ this.todos[i].id + "?access_token=33d122037f7bd215d051e3f94dfb13f0a8602f81",
+    		url: "https://api.github.com/repos/amykangweb/portfolio/issues/"+ this.todos[i].id + "?access_token=b1398d9c6929724bf26c36d845c4afa4fa797e32",
     		type: 'PATCH',
 				data: '{"state": "'+ now +'"}',
 				contentType: "application/json; charset=utf-8",
