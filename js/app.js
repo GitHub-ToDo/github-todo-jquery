@@ -1,6 +1,25 @@
+$.get( "https://api.github.com/repos/amykangweb/portfolio/issues?state=open&access_token=333f4d2ef1cb9f3bdd6ba694a05306594c147125", function( data ) {
+  e = jQuery.Event( 'keyup', { which: 13 } );
+  notices = [];
+  numbers = [];
+  $(data).each(function(issue) {
+    notices.push(data[issue].title.toString());
+    numbers.push(data[issue].number.toString());
+  });
+
+  var setTask = function(element){
+    setTimeout(function(){
+      $('#new-todo').val(element);
+      $('#new-todo').trigger(e);
+    }, 20);
+  }
+  notices.forEach(setTask);
+
 /*global jQuery, Handlebars, Router */
 jQuery(function ($) {
 	'use strict';
+
+	console.log(numbers);
 
 	Handlebars.registerHelper('eq', function (a, b, options) {
 		return a === b ? options.fn(this) : options.inverse(this);
@@ -14,33 +33,19 @@ jQuery(function ($) {
 			/*jshint bitwise:false */
 			var i, random;
 			var uuid = '';
-
-			for (i = 0; i < 32; i++) {
-				random = Math.random() * 16 | 0;
-				if (i === 8 || i === 12 || i === 16 || i === 20) {
-					uuid += '-';
-				}
-				uuid += (i === 12 ? 4 : (i === 16 ? (random & 3 | 8) : random)).toString(16);
-			}
+			/* enter id number here */
+			uuid = numbers.shift();
 
 			return uuid;
 		},
 		pluralize: function (count, word) {
 			return count === 1 ? word : word + 's';
-		},
-		store: function (namespace, data) {
-			if (arguments.length > 1) {
-				return localStorage.setItem(namespace, JSON.stringify(data));
-			} else {
-				var store = localStorage.getItem(namespace);
-				return (store && JSON.parse(store)) || [];
-			}
 		}
 	};
 
 	var App = {
 		init: function () {
-			this.todos = util.store('todos-jquery');
+			this.todos = [];
 			this.cacheElements();
 			this.bindEvents();
 
@@ -82,7 +87,6 @@ jQuery(function ($) {
 			this.$toggleAll.prop('checked', this.getActiveTodos().length === 0);
 			this.renderFooter();
 			this.$newTodo.focus();
-			util.store('todos-jquery', this.todos);
 		},
 		renderFooter: function () {
 			var todoCount = this.todos.length;
@@ -166,14 +170,16 @@ jQuery(function ($) {
 			var now;
 			var i = this.indexFromEl(e.target);
 			this.todos[i].completed = !this.todos[i].completed;
-			if(this.todos[i].completed = true) {
+			if(this.todos[i].completed) {
 				now = "closed";
 			}else {
 				now = "open";
 			}
 
+			console.log(this.todos[i]);
+
 			$.ajax({
-    		url: 'https://api.github.com/repos/amykangweb/portfolio/issues/23?access_token=',
+    		url: 'https://api.github.com/repos/amykangweb/portfolio/issues/23?access_token=333f4d2ef1cb9f3bdd6ba694a05306594c147125',
     		type: 'PATCH',
 				data: '{"state": "'+ now +'"}',
 				contentType: "application/json; charset=utf-8",
@@ -224,4 +230,5 @@ jQuery(function ($) {
 	};
 
 	App.init();
+});
 });
