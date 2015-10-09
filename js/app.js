@@ -1,4 +1,4 @@
-$.get( "https://api.github.com/repos/amykangweb/portfolio/issues?state=all&access_token=b1398d9c6929724bf26c36d845c4afa4fa797e32", function( data ) {
+$.get( "https://api.github.com/repos/amykangweb/portfolio/issues?state=all&access_token=538aae49b1b3330c54a84cfe210fe491746322c0", function( data ) {
 
   var v = jQuery.Event( 'keyup', { which: 13 } );
   numbers = [];
@@ -20,10 +20,8 @@ $.get( "https://api.github.com/repos/amykangweb/portfolio/issues?state=all&acces
 
 	setTimeout(function(){
 		var index = 0;
-		console.log($('#todo-list li'));
 		$('#todo-list li').each(function(){
 			if(states[index] === "closed"){
-				console.log("Closed!" + index.toString());
 				$(this).addClass('completed');
 			}else{
 				$(this).removeClass('completed');
@@ -205,20 +203,17 @@ jQuery(function ($) {
 		toggle: function (e) {
 			var now;
 			var i = this.indexFromEl(e.target);
-			console.log(this.todos[i].completed);
 			this.todos[i].completed = !this.todos[i].completed;
-			if(this.todos[i].completed === true) {
+			if(this.todos[i].completed) {
 				$(this.todos[i]).addClass("completed");
 				now = "closed";
-			}else if(this.todos[i].completed === false){
+			}else{
 				$(this.todos[i]).removeClass("completed");
 				now = "open";
 			}
 
-			console.log(now);
-
 			$.ajax({
-    		url: "https://api.github.com/repos/amykangweb/portfolio/issues/"+ this.todos[i].id + "?access_token=b1398d9c6929724bf26c36d845c4afa4fa797e32",
+    		url: "https://api.github.com/repos/amykangweb/portfolio/issues/"+ this.todos[i].id + "?access_token=538aae49b1b3330c54a84cfe210fe491746322c0",
     		type: 'PATCH',
 				data: '{"state": "'+ now +'"}',
 				contentType: "application/json; charset=utf-8",
