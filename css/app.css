@@ -2,3 +2,9 @@
 #footer {
  display: none;
 }
+
+#startApp {
+  background: #EAD7D7;
+  padding: 10px;
+  font-weight: bold;
+}
