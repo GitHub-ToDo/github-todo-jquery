@@ -1,35 +1,3 @@
-$.get( "https://api.github.com/repos/amykangweb/portfolio/issues?state=all&access_token=538aae49b1b3330c54a84cfe210fe491746322c0", function( data ) {
-
-  var v = jQuery.Event( 'keyup', { which: 13 } );
-  numbers = [];
-  states = [];
-	notices = [];
-	$(data).each(function(issue) {
-		notices.push(data[issue].title.toString());
-		states.push(data[issue].state.toString());
-		numbers.push(data[issue].number);
-	});
-
-	var setTask = function(element){
-		setTimeout(function(){
-		$('#new-todo').val(element);
-		$('#new-todo').trigger(v);
-		}, 20);
-	}
-	notices.forEach(setTask);
-
-	setTimeout(function(){
-		var index = 0;
-		$('#todo-list li').each(function(){
-			if(states[index] === "closed"){
-				$(this).addClass('completed');
-			}else{
-				$(this).removeClass('completed');
-			}
-		index++;
-	});
-	}, 20);
-
 /*global jQuery, Handlebars, Router */
 jQuery(function ($) {
 	'use strict';
@@ -38,24 +6,49 @@ jQuery(function ($) {
 		return a === b ? options.fn(this) : options.inverse(this);
 	});
 
+	var name;
+	var repo;
+	var token;
+
+	function userInfo() {
+		while(!name || !repo || !token){
+			alert("You must enter all the information to proceed.");
+			name = prompt("What is your github username?");
+			repo = prompt("Which repository issues do you want to fetch?");
+			token = prompt("Please enter your authorization token.");
+		}
+	}
+	userInfo();
+
 	var ENTER_KEY = 13;
 	var ESCAPE_KEY = 27;
+  var numbers = [];
+  var states = [];
+	var notices = [];
 
-	var issue = {
-		status: function() {
-			var status;
-			var revise = [];
-			for(var i = 0; i < states.length; i++) {
-				if(states[i] == "open") {
-					/* completed should be set to false if issue is open*/
-					revise.push(false);
-				}else{
-					revise.push(true);
-				}
+	$.get("https://api.github.com/repos/" + name + "/" + repo + "/issues?state=all&access_token=" + token, function( data ) {
+
+	  var v = jQuery.Event( 'keyup', { which: 13 } );
+
+		$(data).each(function(issue) {
+			notices.push(data[issue].title.toString());
+			if(data[issue].state === "open") {
+				states.push(false);
+			}else{
+				states.push(true);
 			}
-			return status = revise.shift();
+			numbers.push(data[issue].number);
+		});
+
+		var setTask = function(element){
+			setTimeout(function(){
+			$('#new-todo').val(element);
+			$('#new-todo').trigger(v);
+			}, 20);
 		}
-	};
+		notices.forEach(setTask);
+
+	});
 
 	var util = {
 		uuid: function () {
@@ -111,9 +104,9 @@ jQuery(function ($) {
 		},
 		render: function () {
 			var todos = this.getFilteredTodos();
+			this.setClass();
 			this.$todoList.html(this.todoTemplate(todos));
 			this.$main.toggle(todos.length > 0);
-			/*what's this?? TOGGLING CHECKED ATTR*/
 			this.$toggleAll.prop('checked', this.getActiveTodos().length === 0);
 			this.renderFooter();
 			this.$newTodo.focus();
@@ -132,7 +125,6 @@ jQuery(function ($) {
 		},
 		toggleAll: function (e) {
 			var isChecked = $(e.target).prop('checked');
-
 			this.todos.forEach(function (todo) {
 				if(isChecked === true) {
 					isChecked = false;
@@ -193,12 +185,24 @@ jQuery(function ($) {
 			this.todos.push({
 				id: util.uuid(),
 				title: val,
-				completed: issue.status()
+				completed: states.shift()
 			});
 
 			$input.val('');
 
 			this.render();
+		},
+		setClass: function() {
+			$("#todo-list").each(function() {
+					$(this).find('li').each(function(){
+						var el = App.indexFromEl(this);
+						if(App.todos[el].completed === true){
+							$(this).addClass("completed");
+						}else{
+							$(this).removeClass("completed");
+						}
+					});
+				});
 		},
 		toggle: function (e) {
 			var now;
@@ -213,14 +217,14 @@ jQuery(function ($) {
 			}
 
 			$.ajax({
-    		url: "https://api.github.com/repos/amykangweb/portfolio/issues/"+ this.todos[i].id + "?access_token=538aae49b1b3330c54a84cfe210fe491746322c0",
+    		url: "https://api.github.com/repos/" + name + "/" + repo + "/issues/"+ this.todos[i].id + "?access_token=" + token,
     		type: 'PATCH',
 				data: '{"state": "'+ now +'"}',
 				contentType: "application/json; charset=utf-8",
     		success: function(result) {
-        	alert(JSON.stringify(result));
-    	}
-		});
+    			alert("Issue updated.");
+				}
+			});
 			this.render();
 		},
 		edit: function (e) {
@@ -264,5 +268,4 @@ jQuery(function ($) {
 	};
 
 	App.init();
-});
 });
