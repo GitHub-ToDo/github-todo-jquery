@@ -10,5 +10,5 @@ Our goal on this project was the take the existing jQuery Todo list example and 
 
 <h2>Resources</h2>
 
-http://todomvc.com/examples/jquery/#/all
+http://todomvc.com/examples/jquery/#/all<br>
 https://developer.github.com/v3/
