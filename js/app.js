@@ -6,49 +6,52 @@ jQuery(function ($) {
 		return a === b ? options.fn(this) : options.inverse(this);
 	});
 
+	var ENTER_KEY = 13;
+	var ESCAPE_KEY = 27;
+  var numbers = [];
+  var states = [];
+	var notices = [];
 	var name;
 	var repo;
 	var token;
 
-	function userInfo() {
+	$("#startApp").on('click', function() {
 		while(!name || !repo || !token){
 			alert("You must enter all the information to proceed.");
 			name = prompt("What is your github username?");
 			repo = prompt("Which repository issues do you want to fetch?");
 			token = prompt("Please enter your authorization token.");
 		}
-	}
-	userInfo();
-
-	var ENTER_KEY = 13;
-	var ESCAPE_KEY = 27;
-  var numbers = [];
-  var states = [];
-	var notices = [];
-
-	$.get("https://api.github.com/repos/" + name + "/" + repo + "/issues?state=all&access_token=" + token, function( data ) {
-
-	  var v = jQuery.Event( 'keyup', { which: 13 } );
-
-		$(data).each(function(issue) {
-			notices.push(data[issue].title.toString());
-			if(data[issue].state === "open") {
-				states.push(false);
-			}else{
-				states.push(true);
-			}
-			numbers.push(data[issue].number);
-		});
-
-		var setTask = function(element){
-			setTimeout(function(){
-			$('#new-todo').val(element);
-			$('#new-todo').trigger(v);
-			}, 20);
-		}
-		notices.forEach(setTask);
-
+		github.fetchGithub();
 	});
+
+	var github = {
+		fetchGithub: function() {
+			$.get("https://api.github.com/repos/" + name + "/" + repo + "/issues?state=all&access_token=" + token, function( data ) {
+
+			  var v = jQuery.Event( 'keyup', { which: 13 } );
+
+				$(data).each(function(issue) {
+					notices.push(data[issue].title.toString());
+					if(data[issue].state === "open") {
+						states.push(false);
+					}else{
+						states.push(true);
+					}
+					numbers.push(data[issue].number);
+				});
+
+				var setTask = function(element){
+					setTimeout(function(){
+					$('#new-todo').val(element);
+					$('#new-todo').trigger(v);
+					}, 20);
+				}
+				notices.forEach(setTask);
+
+			});
+		}
+	};
 
 	var util = {
 		uuid: function () {
